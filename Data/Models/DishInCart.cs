@@ -15,6 +15,9 @@ namespace food_delivery.Data.Models
         [ForeignKey("UserId")]
         public int UserId { get; set; }
 
+        [ForeignKey("OrderId")]
+        public int? OrderId { get; set; }
+
         public int Count { get; set; }
     }
 }
