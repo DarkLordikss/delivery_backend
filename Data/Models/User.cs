@@ -7,7 +7,7 @@ namespace food_delivery.Data.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string FullName { get; set; }
 

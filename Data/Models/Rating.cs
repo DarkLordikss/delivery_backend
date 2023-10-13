@@ -15,6 +15,6 @@ namespace food_delivery.Data.Models
         public Guid DishId { get; set; }
 
         [ForeignKey("UserId")]
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
     }
 }
