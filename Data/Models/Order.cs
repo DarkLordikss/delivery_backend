@@ -6,7 +6,6 @@ namespace food_delivery.Data.Models
     public class Order
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
         public DateTime OrderTime { get; set; }
