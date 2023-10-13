@@ -1,6 +1,9 @@
 ﻿using food_delivery.Data.Models;
 using food_delivery.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Collections.Generic;
+
 public class DishService
 {
     private readonly AppDbContext _context;
@@ -18,48 +21,46 @@ public class DishService
         string sorting = "NameAsc"
     )
     {
-        var dishes = _context.Dishes;
-        var ratings = _context.Ratings;
-
-        var query = _context.Dishes
-            .Join(_context.Ratings, d => d.Id, r => r.DishId, (dish, rating) => new { Dish = dish, Rating = rating });
-
+        var query = _context.Dishes.AsQueryable();
 
         if (categories != null && categories.Any())
         {
-            query = query.Where(d => categories.Contains(d.Dish.Category));
+            query = query.Where(d => categories.Contains(d.Category));
         }
 
-        if (vegetarian == true)
+        if (vegetarian)
         {
-            query = query.Where(d => d.Dish.IsVegetarian == vegetarian);
+            query = query.Where(d => d.IsVegetarian);
         }
 
         switch (sorting)
         {
             case "NameAsc":
-                query = query.OrderBy(d => d.Dish.Name);
+                query = query.OrderBy(d => d.Name);
                 break;
             case "NameDesc":
-                query = query.OrderByDescending(d => d.Dish.Name);
+                query = query.OrderByDescending(d => d.Name);
                 break;
             case "PriceAsc":
-                query = query.OrderBy(d => d.Dish.Price);
+                query = query.OrderBy(d => d.Price);
                 break;
             case "PriceDesc":
-                query = query.OrderByDescending(d => d.Dish.Price);
+                query = query.OrderByDescending(d => d.Price);
                 break;
             case "RatingAsc":
-                query = query.OrderBy(d => d.Rating.Value);
+                query = query.OrderBy(d => _context.Ratings
+                    .Where(r => r.DishId == d.Id)
+                    .Average(r => r.Value));
                 break;
             case "RatingDesc":
-                query = query.OrderByDescending(d => d.Rating.Value);
+                query = query.OrderByDescending(d => _context.Ratings
+                    .Where(r => r.DishId == d.Id)
+                    .Average(r => r.Value));
                 break;
             default:
                 break;
         }
 
-
-        return query.Select(d => d.Dish).Skip((page - 1) * pageSize).Take(pageSize);
+        return query.Skip((page - 1) * pageSize).Take(pageSize);
     }
 }
