@@ -48,14 +48,10 @@ public class DishService
                 query = query.OrderByDescending(d => d.Price);
                 break;
             case "RatingAsc":
-                query = query.OrderBy(d => _context.Ratings
-                    .Where(r => r.DishId == d.Id)
-                    .Average(r => r.Value));
+                query = query.OrderBy(d => d.Rating);
                 break;
             case "RatingDesc":
-                query = query.OrderByDescending(d => _context.Ratings
-                    .Where(r => r.DishId == d.Id)
-                    .Average(r => r.Value));
+                query = query.OrderByDescending(d => d.Rating);
                 break;
             default:
                 break;
