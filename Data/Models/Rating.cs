@@ -12,9 +12,9 @@ namespace food_delivery.Data.Models
         public int Value { get; set; }
 
         [ForeignKey("DishId")]
-        public int DishId { get; set; }
+        public Guid DishId { get; set; }
 
         [ForeignKey("UserId")]
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
     }
 }
