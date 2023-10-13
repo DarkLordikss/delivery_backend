@@ -23,6 +23,8 @@ namespace food_delivery.Data
 
         public DbSet<User> Users { get; set; }
 
+        public DbSet<Password> Passwords { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
