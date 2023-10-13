@@ -16,7 +16,7 @@ public class DishService
     public IQueryable<Dish> GetDishes(
         int page = 1,
         int pageSize = 20,
-        List<string> categories = null,
+        string[] categories = null,
         bool vegetarian = false,
         string sorting = "NameAsc"
     )
