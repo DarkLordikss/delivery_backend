@@ -65,4 +65,17 @@ public class DishService
         return _context.Dishes.SingleOrDefault(d => d.Id == id);
     }
 
+    public bool UserHasPermissionToRateDish(Guid dishId, Guid userId)
+    {
+        var cartItems = _context.DishesInCart
+            .Where(item => item.DishId == dishId && item.UserId == userId)
+            .ToList();
+
+        return cartItems.Any(cartItem =>
+        {
+            var order = _context.Orders.SingleOrDefault(o => o.Id == cartItem.OrderId);
+            return order != null && order.Status == "Delivered";
+        });
+    }
+
 }
