@@ -7,7 +7,7 @@ namespace food_delivery.Data.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public DateTime OrderTime { get; set; }
 
@@ -18,6 +18,6 @@ namespace food_delivery.Data.Models
         [ForeignKey("AddressId")]
         public int AddressId { get; set; }
 
-        public Status Status { get; set; }
+        public string Status { get; set; }
     }
 }
