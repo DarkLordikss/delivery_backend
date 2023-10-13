@@ -59,4 +59,10 @@ public class DishService
 
         return query.Skip((page - 1) * pageSize).Take(pageSize);
     }
+
+    public Dish GetDish(Guid id)
+    {
+        return _context.Dishes.SingleOrDefault(d => d.Id == id);
+    }
+
 }
