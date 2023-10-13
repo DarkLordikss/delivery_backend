@@ -78,4 +78,55 @@ public class DishService
         });
     }
 
+    public bool RateDish(Guid dishId, Guid userId, int ratingValue)
+    {
+        if (!UserHasPermissionToRateDish(dishId, userId))
+        {
+            return false;
+        }
+
+        var existingRating = _context.Ratings
+            .SingleOrDefault(r => r.DishId == dishId && r.UserId == userId);
+
+        if (existingRating != null)
+        {
+            existingRating.Value = ratingValue;
+        }
+        else
+        {
+            var newRating = new Rating
+            {
+                DishId = dishId,
+                UserId = userId,
+                Value = ratingValue
+            };
+
+            _context.Ratings.Add(newRating);
+        }
+
+        _context.SaveChanges();
+
+        UpdateDishRating(dishId);
+
+        return true;
+    }
+
+
+    private void UpdateDishRating(Guid dishId)
+    {
+        var ratings = _context.Ratings.Where(r => r.DishId == dishId).ToList();
+
+        if (ratings.Any())
+        {
+            decimal averageRating = (decimal)ratings.Average(r => r.Value);
+
+            var dish = _context.Dishes.SingleOrDefault(d => d.Id == dishId);
+            if (dish != null)
+            {
+                dish.Rating = averageRating;
+                _context.SaveChanges();
+            }
+        }
+    }
+
 }
