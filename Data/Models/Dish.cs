@@ -6,12 +6,15 @@ namespace food_delivery.Data.Models
     public class Dish
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
         public string Name { get; set; }
 
         public decimal Price { get; set; }
+
+        public string Description { get; set; }
+
+        public decimal Rating { get; set; }
 
         public bool IsVegetarian { get; set; }
 
