@@ -87,6 +87,38 @@ namespace food_delivery.Services
             return existingCartItem?.Id;
         }
 
+        public int? DecreaseOrRemoveDishFromBasket(Guid userId, Guid dishId, bool increase)
+        {
+            var cartItem = _context.DishesInCart
+                .SingleOrDefault(item => item.UserId == userId && item.DishId == dishId && item.OrderId == null);
+
+            if (cartItem == null)
+            {
+                return null;
+            }
+
+            if (increase)
+            {
+                if (cartItem.Count > 1)
+                {
+                    cartItem.Count -= 1;
+                }
+                else
+                {
+                    _context.DishesInCart.Remove(cartItem);
+                }
+            }
+            else
+            {
+                _context.DishesInCart.Remove(cartItem);
+            }
+
+            _context.SaveChanges();
+
+            return cartItem.Id;
+        }
+
+
     }
 
 }
