@@ -1,4 +1,5 @@
 using food_delivery.Data;
+using food_delivery.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
@@ -27,6 +28,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Configuration.AddJsonFile("appsettings.Develop.json", optional: true);
 
 builder.Services.AddScoped<DishService>();
+builder.Services.AddScoped<BasketService>();
 
 var app = builder.Build();
 
