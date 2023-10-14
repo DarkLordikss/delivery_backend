@@ -1,5 +1,6 @@
 ﻿using food_delivery.Data;
 using food_delivery.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace food_delivery.Services
 {
@@ -50,5 +51,42 @@ namespace food_delivery.Services
 
             return userBasket;
         }
+
+        public int? AddDishToBasket(Guid userId, Guid dishId, int count)
+        {
+            var dish = _context.Dishes.SingleOrDefault(d => d.Id == dishId);
+            if (dish == null)
+            {
+                return null;
+            }
+
+            var existingCartItem = _context.DishesInCart
+                .SingleOrDefault(item => item.UserId == userId && item.DishId == dishId && item.OrderId == null);
+
+            if (existingCartItem != null)
+            {
+                existingCartItem.Count += count;
+            }
+            else
+            {
+                var newCartItem = new DishInCart
+                {
+                    UserId = userId,
+                    DishId = dishId,
+                    Count = count
+                };
+
+                _context.DishesInCart.Add(newCartItem);
+            }
+
+            _context.SaveChanges();
+
+            existingCartItem = _context.DishesInCart
+                .SingleOrDefault(item => item.UserId == userId && item.DishId == dishId && item.OrderId == null);
+
+            return existingCartItem?.Id;
+        }
+
     }
+
 }
