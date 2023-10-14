@@ -29,6 +29,7 @@ builder.Configuration.AddJsonFile("appsettings.Develop.json", optional: true);
 
 builder.Services.AddScoped<DishService>();
 builder.Services.AddScoped<BasketService>();
+builder.Services.AddScoped<AddressService>();
 
 var app = builder.Build();
 
