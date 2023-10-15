@@ -74,7 +74,28 @@ namespace food_delivery.Services
 
         public User? GetUser(Guid userId)
         {
-            return _context.Users.SingleOrDefault(u => u.Id ==  userId);
+            return _context.Users.SingleOrDefault(u => u.Id == userId);
+        }
+
+        public Guid? EditUser(UserEditModel newUserData, Guid userId)
+        {
+            var oldUser = _context.Users.SingleOrDefault(u => u.Id == userId);
+
+            if (oldUser == null)
+            {
+                return null;
+            }
+
+            oldUser.FullName = newUserData.FullName;
+            oldUser.Addressid = newUserData.Addressid;
+            oldUser.BirthDate = newUserData.BirthDate;
+            oldUser.Gender = newUserData.Gender;
+            oldUser.Phone = newUserData.Phone;
+
+            _context.Users.Update(oldUser);
+            _context.SaveChanges();
+
+            return userId;
         }
 
         private string GenerateSalt()
