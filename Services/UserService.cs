@@ -72,6 +72,11 @@ namespace food_delivery.Services
             return null;
         }
 
+        public User? GetUser(Guid userId)
+        {
+            return _context.Users.SingleOrDefault(u => u.Id ==  userId);
+        }
+
         private string GenerateSalt()
         {
             using (var rng = RandomNumberGenerator.Create())
