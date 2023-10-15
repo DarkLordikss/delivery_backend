@@ -14,5 +14,16 @@ namespace food_delivery.Services
         {
             _context = context;
         }
+
+        private string GenerateSalt()
+        {
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                byte[] saltBytes = new byte[16];
+                rng.GetBytes(saltBytes);
+                return Convert.ToBase64String(saltBytes);
+            }
+        }
+
     }
 }
