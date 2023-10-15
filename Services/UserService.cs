@@ -46,6 +46,32 @@ namespace food_delivery.Services
             return userId;
         }
 
+        public User? LoginUser(LoginModel loginData)
+        {
+            var user = _context.Users.SingleOrDefault(u => u.Email == loginData.Email);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            var passwordRecord = _context.Passwords.SingleOrDefault(u => u.UserId == user.Id);
+
+            if (passwordRecord == null)
+            {
+                return null;
+            }
+
+            string hashedPassword = HashPassword(loginData.Password, passwordRecord.Salt);
+
+            if (hashedPassword == passwordRecord.PasswordHash)
+            {
+                return user;
+            }
+
+            return null;
+        }
+
         private string GenerateSalt()
         {
             using (var rng = RandomNumberGenerator.Create())
