@@ -15,6 +15,37 @@ namespace food_delivery.Services
             _context = context;
         }
 
+        public Guid RegisterUser(UserRegistrationModel user)
+        {
+            string salt = GenerateSalt();
+            string hashedPassword = HashPassword(user.Password, salt);
+            Guid userId = Guid.NewGuid();
+
+            var newUser = new User
+            {
+                Id = userId,
+                FullName = user.FullName,
+                BirthDate = user.BirthDate,
+                Gender = user.Gender,
+                Phone = user.Phone,
+                Email = user.Email,
+                Addressid = user.Addressid,
+            };
+
+            var newPassword = new Password
+            {
+                UserId = userId,
+                Salt = salt,
+                PasswordHash = hashedPassword
+            };
+
+            _context.Passwords.Add(newPassword);
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+
+            return userId;
+        }
+
         private string GenerateSalt()
         {
             using (var rng = RandomNumberGenerator.Create())
