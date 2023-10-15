@@ -18,7 +18,7 @@ namespace food_delivery.Data.Models
 
         public string Email { get; set; }
 
-        [ForeignKey("UserId")]
+        [ForeignKey("AddressId")]
         public Guid AddressId { get; set; }
     }
 }
