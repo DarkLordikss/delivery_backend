@@ -2,6 +2,6 @@
 {
     public class UserRegistrationModel : User
     {
-        public string PasswordHash { get; set; }
+        public string Password { get; set; }
     }
 }
