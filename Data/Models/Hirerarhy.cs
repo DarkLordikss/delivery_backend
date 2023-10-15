@@ -7,14 +7,14 @@ namespace food_delivery.Data.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [ForeignKey("Objectid")]
-        public int Objectid { get; set; }
+        public long Objectid { get; set; }
 
         [ForeignKey("Parentid")]
-        public int Parentobjid { get; set; }
+        public long Parentobjid { get; set; }
 
-        public bool Isactive { get; set; }
+        public int Isactive { get; set; }
     }
 }

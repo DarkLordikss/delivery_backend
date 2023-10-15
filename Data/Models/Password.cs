@@ -10,5 +10,7 @@ namespace food_delivery.Data.Models
         public Guid UserId { get; set; }
 
         public string PasswordHash { get; set; }
+
+        public string Salt { get; set; }
     }
 }

@@ -1,11 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 
 namespace food_delivery.Data.Models
 {
     public class User
     {
         [Key]
+        [IgnoreDataMember]
+        [DefaultValue(typeof(Guid), "00000000-0000-0000-0000-000000000000")]
         public Guid Id { get; set; }
 
         public string FullName { get; set; }
@@ -18,6 +22,7 @@ namespace food_delivery.Data.Models
 
         public string Email { get; set; }
 
-        public string Address { get; set; }
+        [ForeignKey("AddressId")]
+        public Guid Addressid { get; set; }
     }
 }
