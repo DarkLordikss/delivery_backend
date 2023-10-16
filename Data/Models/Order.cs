@@ -10,12 +10,12 @@ namespace food_delivery.Data.Models
 
         public DateTime OrderTime { get; set; }
 
-        public DateTime? DeliveryTime { get; set; }
+        public DateTime DeliveryTime { get; set; }
 
         public decimal Price { get; set; }
 
         [ForeignKey("AddressId")]
-        public int AddressId { get; set; }
+        public Guid AddressId { get; set; }
 
         public string Status { get; set; }
     }
