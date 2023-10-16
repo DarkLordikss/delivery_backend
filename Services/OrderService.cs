@@ -52,6 +52,44 @@ namespace food_delivery.Services
             return orders;
         }
 
+        public Guid? CreateOrder(Guid userId, CreateOrderModel createOrderModel)
+        {
+            var newOrderId = Guid.NewGuid();
+
+            var cartItems = _context.DishesInCart
+                .Where(d => d.UserId == userId && d.OrderId == null)
+                .ToList();
+
+            if (cartItems == null)
+            {
+                return null;
+            }
+
+            foreach (var cartItem in cartItems)
+            {
+                cartItem.OrderId = newOrderId;
+            }
+
+            _context.SaveChanges();
+
+            decimal totalOrderPrice = cartItems.Sum(item => _context.Dishes.Single(d => d.Id == item.DishId).Price * item.Count);
+
+            var newOrder = new Order
+            {
+                Id = newOrderId,
+                OrderTime = DateTime.Now.ToUniversalTime(),
+                DeliveryTime = createOrderModel.DeliveryTime,
+                AddressId = createOrderModel.AddressId,
+                Status = "inProcess",
+                Price = totalOrderPrice,
+            };
+
+            _context.Orders.Add(newOrder);
+            _context.SaveChanges();
+
+            return newOrderId;
+        }
+
         private IQueryable<BasketItem> GetOrderItems(Guid orderId)
         {
             var dishIds = _context.DishesInCart
