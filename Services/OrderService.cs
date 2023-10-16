@@ -90,6 +90,21 @@ namespace food_delivery.Services
             return newOrderId;
         }
 
+        public Guid? ConfirmOrder(Guid orderId)
+        {
+            var order = _context.Orders.SingleOrDefault(o => o.Id == orderId);
+
+            if (order == null)
+            {
+                return null;
+            }
+
+            order.Status = "Delivered";
+            _context.SaveChanges();
+
+            return orderId;
+        }
+
         private IQueryable<BasketItem> GetOrderItems(Guid orderId)
         {
             var dishIds = _context.DishesInCart
