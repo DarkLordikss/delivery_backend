@@ -31,6 +31,7 @@ builder.Services.AddScoped<DishService>();
 builder.Services.AddScoped<BasketService>();
 builder.Services.AddScoped<AddressService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<OrderService>();
 
 var app = builder.Build();
 
