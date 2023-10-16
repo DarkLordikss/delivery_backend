@@ -12,12 +12,11 @@ namespace food_delivery.Services
             _context = context;
         }
 
-        private List<BasketItem> GetOrderItems(Guid userId, Guid orderId)
+        private IQueryable<BasketItem> GetOrderItems(Guid orderId)
         {
             var dishIds = _context.DishesInCart
-                .Where(item => item.UserId == userId && item.OrderId == orderId)
-                .Select(item => item.DishId)
-                .ToList();
+                .Where(item => item.OrderId == orderId)
+                .Select(item => item.DishId);
 
             var basketItems = _context.Dishes
                 .Where(dish => dishIds.Contains(dish.Id))
@@ -27,14 +26,13 @@ namespace food_delivery.Services
                     Name = dish.Name,
                     Price = dish.Price,
                     Amount = _context.DishesInCart
-                        .Where(item => item.UserId == userId && item.DishId == dish.Id && item.OrderId == orderId)
+                        .Where(item => item.DishId == dish.Id && item.OrderId == orderId)
                         .Sum(item => item.Count),
                     TotalPrice = dish.Price * _context.DishesInCart
-                        .Where(item => item.UserId == userId && item.DishId == dish.Id && item.OrderId == orderId)
+                        .Where(item => item.DishId == dish.Id && item.OrderId == orderId)
                         .Sum(item => item.Count),
                     Photo = dish.Photo
-                })
-                .ToList();
+                });
 
             return basketItems;
         }
