@@ -11,6 +11,30 @@ namespace food_delivery.Services
         {
             _context = context;
         }
+        public OrderWithDishes? GetOrderInfo(Guid orderId)
+        {
+            var order = _context.Orders.SingleOrDefault(o => o.Id == orderId);
+
+            if (order == null)
+            {
+                return null;
+            }
+
+            var dishes = GetOrderItems(order.Id);
+
+            var orderWithDishes = new OrderWithDishes
+            {
+                Id = orderId,
+                DeliveryTime = order.DeliveryTime,
+                OrderTime = order.OrderTime,
+                Status = order.Status,
+                Price = dishes.Sum(item => item.TotalPrice),
+                Dishes = dishes.ToList(),
+                AddressId = order.AddressId,
+            };
+
+            return orderWithDishes;
+        }
 
         private IQueryable<BasketItem> GetOrderItems(Guid orderId)
         {
