@@ -1,5 +1,6 @@
 ﻿using food_delivery.Data;
 using food_delivery.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace food_delivery.Services
 {
@@ -34,6 +35,21 @@ namespace food_delivery.Services
             };
 
             return orderWithDishes;
+        }
+
+        public IQueryable<Order> GetOrders(Guid userId)
+        {
+            var uniqueOrderIds = _context.DishesInCart
+                .Where(d => d.UserId == userId && d.OrderId != null)
+                .Select(d => d.OrderId)
+                .Distinct()
+                .ToList();
+
+            var orders = _context.Orders
+                .Where(o => uniqueOrderIds.Contains(o.Id))
+                .AsQueryable();
+
+            return orders;
         }
 
         private IQueryable<BasketItem> GetOrderItems(Guid orderId)
