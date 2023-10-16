@@ -10,7 +10,7 @@ namespace food_delivery.Data.Models
 
         public DateTime OrderTime { get; set; }
 
-        public DateTime? DeliveryTime { get; set; }
+        public DateTime DeliveryTime { get; set; }
 
         public decimal Price { get; set; }
 
