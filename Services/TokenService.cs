@@ -13,7 +13,7 @@ public class TokenService
         _context = context;
     }
 
-    public long GetTokenSeriesByUserId(Guid userId)
+    public long? GetTokenSeriesByUserId(Guid userId)
     {
         var userPassword = _context.Passwords
             .FirstOrDefault(p => p.UserId == userId);
