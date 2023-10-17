@@ -4,6 +4,8 @@ using food_delivery.Responses;
 using food_delivery.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Win32;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 
 namespace food_delivery.Controllers
@@ -25,6 +27,8 @@ namespace food_delivery.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TokenResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
+        [SwaggerOperation(Summary = "Register new user")]
+        [Produces("application/json")]
         public ActionResult Register(UserRegistrationModel user)
         {
             try
