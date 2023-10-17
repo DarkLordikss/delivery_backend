@@ -47,6 +47,23 @@ namespace food_delivery.Services
             return userId;
         }
 
+        public Guid? LogoutUser(Guid userId)
+        {
+            var passwordData = _context.Passwords.SingleOrDefault(u => u.UserId == userId);
+
+            if (passwordData == null)
+            {
+                return null;
+            }
+
+            passwordData.TokenSeries += 1;
+
+            _context.Passwords.Update(passwordData);
+            _context.SaveChanges();
+
+            return userId;
+        }
+
         public User? LoginUser(LoginModel loginData)
         {
             var user = _context.Users.SingleOrDefault(u => u.Email == loginData.Email);
