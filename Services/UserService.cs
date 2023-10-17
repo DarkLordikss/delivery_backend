@@ -36,7 +36,8 @@ namespace food_delivery.Services
             {
                 UserId = userId,
                 Salt = salt,
-                PasswordHash = hashedPassword
+                PasswordHash = hashedPassword,
+                TokenSeries = 0
             };
 
             _context.Passwords.Add(newPassword);
