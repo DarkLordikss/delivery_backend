@@ -1,6 +1,6 @@
 ﻿namespace food_delivery.Errors
 {
-    public class ErrorResponce
+    public class ErrorResponse
     {
         public string ErrorMessage { get; set; }
     }
