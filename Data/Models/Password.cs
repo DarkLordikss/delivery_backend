@@ -12,5 +12,7 @@ namespace food_delivery.Data.Models
         public string PasswordHash { get; set; }
 
         public string Salt { get; set; }
+
+        public long TokenSeries { get; set; }
     }
 }

@@ -36,11 +36,29 @@ namespace food_delivery.Services
             {
                 UserId = userId,
                 Salt = salt,
-                PasswordHash = hashedPassword
+                PasswordHash = hashedPassword,
+                TokenSeries = 0
             };
 
             _context.Passwords.Add(newPassword);
             _context.Users.Add(newUser);
+            _context.SaveChanges();
+
+            return userId;
+        }
+
+        public Guid? LogoutUser(Guid userId)
+        {
+            var passwordData = _context.Passwords.SingleOrDefault(u => u.UserId == userId);
+
+            if (passwordData == null)
+            {
+                return null;
+            }
+
+            passwordData.TokenSeries += 1;
+
+            _context.Passwords.Update(passwordData);
             _context.SaveChanges();
 
             return userId;
