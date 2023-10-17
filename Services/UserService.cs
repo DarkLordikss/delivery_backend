@@ -25,7 +25,7 @@ namespace food_delivery.Services
             {
                 Id = userId,
                 FullName = user.FullName,
-                BirthDate = user.BirthDate,
+                BirthDate = user.BirthDate.ToUniversalTime(),
                 Gender = user.Gender,
                 Phone = user.Phone,
                 Email = user.Email,
