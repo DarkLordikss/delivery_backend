@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using food_delivery.Data.Models;
+using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
 namespace food_delivery.Policies
@@ -15,12 +16,14 @@ namespace food_delivery.Policies
         protected override Task HandleRequirementAsync(
             AuthorizationHandlerContext context, TokenSeriesRequirement requirement)
         {
-            if (context.User.Identity.IsAuthenticated)
-            {
-                string userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                string actualTokenSeries = _tokenService.GetTokenSeriesByUserId(Guid.Parse(userId));
+            string? userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                if (actualTokenSeries != null && actualTokenSeries == requirement.TokenSeries)
+            if (userId != null)
+            {
+                long? actualTokenSeries = _tokenService.GetTokenSeriesByUserId(Guid.Parse(userId));
+                string? tokenSeries = context.User.FindFirst(ClaimTypes.Version)?.Value;
+
+                if (actualTokenSeries != null && tokenSeries != null && actualTokenSeries.ToString() == tokenSeries)
                 {
                     context.Succeed(requirement);
                 }
