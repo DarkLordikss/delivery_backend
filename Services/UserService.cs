@@ -54,7 +54,7 @@ namespace food_delivery.Services
             return userId;
         }
 
-        public Guid? LogoutUser(Guid userId)
+        public Guid LogoutUser(Guid userId)
         {
             var passwordData = _context.Passwords.SingleOrDefault(u => u.UserId == userId);
 
@@ -97,18 +97,25 @@ namespace food_delivery.Services
             throw new ArgumentException();
         }
 
-        public User? GetUser(Guid userId)
+        public User GetUser(Guid userId)
         {
-            return _context.Users.SingleOrDefault(u => u.Id == userId);
+            var user = _context.Users.SingleOrDefault(u => u.Id == userId);
+
+            if (user == null)
+            {
+                throw new ArgumentException();
+            }
+
+            return user;
         }
 
-        public Guid? EditUser(UserEditModel newUserData, Guid userId)
+        public Guid EditUser(UserEditModel newUserData, Guid userId)
         {
             var oldUser = _context.Users.SingleOrDefault(u => u.Id == userId);
 
             if (oldUser == null)
             {
-                return null;
+                throw new ArgumentException();
             }
 
             oldUser.FullName = newUserData.FullName;
