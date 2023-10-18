@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using food_delivery.Data.Models;
 
-namespace food_delivery.Data.Models
+namespace food_delivery.RequestModels
 {
-    public class UserEditModel
+    public class UserEditRequest
     {
 
         [Required(ErrorMessage = "Full name is required.")]

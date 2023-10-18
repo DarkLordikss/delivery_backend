@@ -1,5 +1,6 @@
 ﻿using food_delivery.Data;
 using food_delivery.Data.Models;
+using food_delivery.ResponseModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace food_delivery.Services
@@ -13,7 +14,7 @@ namespace food_delivery.Services
             _context = context;
         }
 
-        public Basket GetUserBasket(Guid userId)
+        public BasketResponse GetUserBasket(Guid userId)
         {
             var dishIds = _context.DishesInCart
                 .Where(item => item.UserId == userId && item.OrderId == null)
@@ -39,7 +40,7 @@ namespace food_delivery.Services
 
             decimal total = userBasketItems.Sum(item => item.Price * item.Amount);
 
-            var userBasket = new Basket
+            var userBasket = new BasketResponse
             {
                 Items = userBasketItems,
                 Total = new BasketTotal
