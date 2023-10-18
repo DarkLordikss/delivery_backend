@@ -26,7 +26,7 @@ namespace food_delivery.Controllers
 
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TokenResponse))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
         [SwaggerOperation(Summary = "Register new user")]
         [Produces("application/json")]
@@ -56,7 +56,7 @@ namespace food_delivery.Controllers
 
         [HttpPost("login")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TokenResponse))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
         [SwaggerOperation(Summary = "Login into the system")]
         [Produces("application/json")]
