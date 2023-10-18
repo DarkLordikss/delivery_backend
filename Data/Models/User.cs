@@ -8,8 +8,6 @@ namespace food_delivery.Data.Models
     public class User
     {
         [Key]
-        [IgnoreDataMember]
-        [DefaultValue(typeof(Guid), "00000000-0000-0000-0000-000000000000")]
         public Guid Id { get; set; }
 
         public string FullName { get; set; }
@@ -22,7 +20,6 @@ namespace food_delivery.Data.Models
 
         public string Email { get; set; }
 
-        [ForeignKey("AddressId")]
         public Guid Addressid { get; set; }
     }
 }
