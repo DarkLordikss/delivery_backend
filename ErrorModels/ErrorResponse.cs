@@ -1,4 +1,4 @@
-﻿namespace food_delivery.Errors
+﻿namespace food_delivery.ErrorModels
 {
     public class ErrorResponse
     {

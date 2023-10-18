@@ -1,6 +1,7 @@
 ﻿using food_delivery.Data.Models;
-using food_delivery.Errors;
-using food_delivery.Responses;
+using food_delivery.ErrorModels;
+using food_delivery.RequestModels;
+using food_delivery.ResponseModels;
 using food_delivery.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +31,7 @@ namespace food_delivery.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
         [SwaggerOperation(Summary = "Register new user")]
         [Produces("application/json")]
-        public ActionResult Register(UserRegistrationModel user)
+        public ActionResult Register(UserRegistrationRequest user)
         {
             try
             {
@@ -60,7 +61,7 @@ namespace food_delivery.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
         [SwaggerOperation(Summary = "Login into the system")]
         [Produces("application/json")]
-        public ActionResult Login(LoginModel user)
+        public ActionResult Login(UserLoginRequest user)
         {
             try
             {
@@ -165,7 +166,7 @@ namespace food_delivery.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
         [SwaggerOperation(Summary = "Edit user profile")]
         [Produces("application/json")]
-        public ActionResult EditUserProfile(UserEditModel newUserData)
+        public ActionResult EditUserProfile(UserEditRequest newUserData)
         {
             try
             {
