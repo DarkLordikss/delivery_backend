@@ -77,14 +77,14 @@ namespace food_delivery.Services
 
             if (user == null)
             {
-                return null;
+                throw new ArgumentException();
             }
 
             var passwordRecord = _context.Passwords.SingleOrDefault(u => u.UserId == user.Id);
 
             if (passwordRecord == null)
             {
-                return null;
+                throw new ArgumentException();
             }
 
             string hashedPassword = HashPassword(loginData.Password, passwordRecord.Salt);
@@ -94,7 +94,7 @@ namespace food_delivery.Services
                 return user;
             }
 
-            return null;
+            throw new ArgumentException();
         }
 
         public User? GetUser(Guid userId)
