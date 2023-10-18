@@ -21,11 +21,18 @@ namespace food_delivery.Services
             string hashedPassword = HashPassword(user.Password, salt);
             Guid userId = Guid.NewGuid();
 
+            var existingUser = _context.Users.SingleOrDefault(u => u.Email == user.Email || u.Phone == user.Phone);
+
+            if (existingUser != null)
+            {
+                throw new ArgumentException();
+            }
+
             var newUser = new User
             {
                 Id = userId,
                 FullName = user.FullName,
-                BirthDate = user.BirthDate,
+                BirthDate = user.BirthDate.ToUniversalTime(),
                 Gender = user.Gender,
                 Phone = user.Phone,
                 Email = user.Email,
@@ -47,13 +54,13 @@ namespace food_delivery.Services
             return userId;
         }
 
-        public Guid? LogoutUser(Guid userId)
+        public Guid LogoutUser(Guid userId)
         {
             var passwordData = _context.Passwords.SingleOrDefault(u => u.UserId == userId);
 
             if (passwordData == null)
             {
-                return null;
+                throw new ArgumentException();
             }
 
             passwordData.TokenSeries += 1;
@@ -64,44 +71,51 @@ namespace food_delivery.Services
             return userId;
         }
 
-        public User? LoginUser(LoginModel loginData)
+        public Guid LoginUser(LoginModel loginData)
         {
             var user = _context.Users.SingleOrDefault(u => u.Email == loginData.Email);
 
             if (user == null)
             {
-                return null;
+                throw new ArgumentException();
             }
 
             var passwordRecord = _context.Passwords.SingleOrDefault(u => u.UserId == user.Id);
 
             if (passwordRecord == null)
             {
-                return null;
+                throw new ArgumentException();
             }
 
             string hashedPassword = HashPassword(loginData.Password, passwordRecord.Salt);
 
             if (hashedPassword == passwordRecord.PasswordHash)
             {
-                return user;
+                return user.Id;
             }
 
-            return null;
+            throw new ArgumentException();
         }
 
-        public User? GetUser(Guid userId)
+        public User GetUser(Guid userId)
         {
-            return _context.Users.SingleOrDefault(u => u.Id == userId);
+            var user = _context.Users.SingleOrDefault(u => u.Id == userId);
+
+            if (user == null)
+            {
+                throw new ArgumentException();
+            }
+
+            return user;
         }
 
-        public Guid? EditUser(UserEditModel newUserData, Guid userId)
+        public Guid EditUser(UserEditModel newUserData, Guid userId)
         {
             var oldUser = _context.Users.SingleOrDefault(u => u.Id == userId);
 
             if (oldUser == null)
             {
-                return null;
+                throw new ArgumentException();
             }
 
             oldUser.FullName = newUserData.FullName;
