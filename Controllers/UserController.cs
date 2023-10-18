@@ -163,7 +163,7 @@ namespace food_delivery.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
-        [SwaggerOperation(Summary = "Get user profile")]
+        [SwaggerOperation(Summary = "Edit user profile")]
         [Produces("application/json")]
         public ActionResult EditUserProfile(UserEditModel newUserData)
         {
