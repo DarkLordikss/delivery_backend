@@ -21,6 +21,13 @@ namespace food_delivery.Services
             string hashedPassword = HashPassword(user.Password, salt);
             Guid userId = Guid.NewGuid();
 
+            var existingUser = _context.Users.SingleOrDefault(u => u.Email == user.Email || u.Phone == user.Phone);
+
+            if (existingUser != null)
+            {
+                throw new ArgumentException();
+            }
+
             var newUser = new User
             {
                 Id = userId,

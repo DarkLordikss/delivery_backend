@@ -40,6 +40,12 @@ namespace food_delivery.Controllers
 
                 return Ok(new { Token = token });
             }
+            catch (ArgumentException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "This user already exist." };
+
+                return Conflict(errorResponce);
+            }
             catch (Exception ex)
             {
                 var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
