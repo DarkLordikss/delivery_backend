@@ -53,5 +53,36 @@ namespace food_delivery.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
             }
         }
+
+        [HttpPost("login")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TokenResponse))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
+        [SwaggerOperation(Summary = "Login into the system")]
+        [Produces("application/json")]
+        public ActionResult Login(LoginModel user)
+        {
+            try
+            {
+                var userId = _userService.LoginUser(user);
+
+                var token = _tokenService.GenerateToken(userId);
+
+                return Ok(new { Token = token });
+            }
+            catch (ArgumentException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "Invalid email or password." };
+
+                return Conflict(errorResponce);
+            }
+            catch (Exception ex)
+            {
+                var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
+
+                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
+            }
+        }
+
     }
 }
