@@ -38,7 +38,7 @@ namespace food_delivery.Controllers
 
                 var token = _tokenService.GenerateToken(userId);
 
-                return Ok(new { Token = token });
+                return Ok(new TokenResponse { Token = token });
             }
             catch (ArgumentException ex)
             {
@@ -68,7 +68,7 @@ namespace food_delivery.Controllers
 
                 var token = _tokenService.GenerateToken(userId);
 
-                return Ok(new { Token = token });
+                return Ok(new TokenResponse { Token = token });
             }
             catch (ArgumentException ex)
             {
@@ -103,7 +103,7 @@ namespace food_delivery.Controllers
 
                 var userId = _userService.LogoutUser(parsedUserId);
 
-                return Ok(new { UserId = userId });
+                return Ok(new GuidUserResponse { UserId = userId });
 
             }
             catch (ArgumentException ex)
