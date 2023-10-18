@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using food_delivery.Data;
 using food_delivery.Data.Models;
+using food_delivery.RequestModels;
 
 namespace food_delivery.Services
 {
@@ -15,7 +16,7 @@ namespace food_delivery.Services
             _context = context;
         }
 
-        public Guid RegisterUser(UserRegistrationModel user)
+        public Guid RegisterUser(UserRegistrationRequest user)
         {
             string salt = GenerateSalt();
             string hashedPassword = HashPassword(user.Password, salt);
@@ -71,7 +72,7 @@ namespace food_delivery.Services
             return userId;
         }
 
-        public Guid LoginUser(LoginModel loginData)
+        public Guid LoginUser(UserLoginRequest loginData)
         {
             var user = _context.Users.SingleOrDefault(u => u.Email == loginData.Email);
 
@@ -109,7 +110,7 @@ namespace food_delivery.Services
             return user;
         }
 
-        public Guid EditUser(UserEditModel newUserData, Guid userId)
+        public Guid EditUser(UserEditRequest newUserData, Guid userId)
         {
             var oldUser = _context.Users.SingleOrDefault(u => u.Id == userId);
 

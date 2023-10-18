@@ -1,6 +1,6 @@
-﻿namespace food_delivery.Data.Models
+﻿namespace food_delivery.RequestModels
 {
-    public class CreateOrderModel
+    public class OrderCreateRequest
     {
         public DateTime DeliveryTime { get; set; }
 

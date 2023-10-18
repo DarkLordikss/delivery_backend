@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace food_delivery.Data.Models
+namespace food_delivery.RequestModels
 {
-    public class LoginModel
+    public class UserLoginRequest
     {
         [Required(ErrorMessage = "Email is required.")]
         public string Email { get; set; }

@@ -1,5 +1,7 @@
 ﻿using food_delivery.Data;
 using food_delivery.Data.Models;
+using food_delivery.RequestModels;
+using food_delivery.ResponseModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace food_delivery.Services
@@ -12,7 +14,7 @@ namespace food_delivery.Services
         {
             _context = context;
         }
-        public OrderWithDishes? GetOrderInfo(Guid orderId)
+        public OrderWithDishesResponse? GetOrderInfo(Guid orderId)
         {
             var order = _context.Orders.SingleOrDefault(o => o.Id == orderId);
 
@@ -23,7 +25,7 @@ namespace food_delivery.Services
 
             var dishes = GetOrderItems(order.Id);
 
-            var orderWithDishes = new OrderWithDishes
+            var orderWithDishes = new OrderWithDishesResponse
             {
                 Id = orderId,
                 DeliveryTime = order.DeliveryTime,
@@ -52,7 +54,7 @@ namespace food_delivery.Services
             return orders;
         }
 
-        public Guid? CreateOrder(Guid userId, CreateOrderModel createOrderModel)
+        public Guid? CreateOrder(Guid userId, OrderCreateRequest createOrderModel)
         {
             var newOrderId = Guid.NewGuid();
 
