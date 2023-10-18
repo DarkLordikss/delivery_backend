@@ -60,7 +60,7 @@ namespace food_delivery.Services
 
             if (passwordData == null)
             {
-                return null;
+                throw new ArgumentException();
             }
 
             passwordData.TokenSeries += 1;
