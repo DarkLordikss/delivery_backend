@@ -71,7 +71,7 @@ namespace food_delivery.Services
             return userId;
         }
 
-        public User? LoginUser(LoginModel loginData)
+        public Guid LoginUser(LoginModel loginData)
         {
             var user = _context.Users.SingleOrDefault(u => u.Email == loginData.Email);
 
@@ -91,7 +91,7 @@ namespace food_delivery.Services
 
             if (hashedPassword == passwordRecord.PasswordHash)
             {
-                return user;
+                return user.Id;
             }
 
             throw new ArgumentException();
