@@ -17,7 +17,7 @@ namespace food_delivery.Data.Models
         public DateTime BirthDate { get; set; }
 
         [Required(ErrorMessage = "Gender is required.")]
-        [EnumDataType(typeof(Gender), ErrorMessage = "Invalid gender value.")]
+        [EnumDataType(typeof(Gender), ErrorMessage = "Invalid gender value. Can be only 'Male' or 'Female'")]
         public string Gender { get; set; }
 
         [Required(ErrorMessage = "Phone is required.")]
