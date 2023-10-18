@@ -1,4 +1,4 @@
-﻿namespace food_delivery.Responses
+﻿namespace food_delivery.ResponseModels
 {
     public class GuidUserResponse
     {
