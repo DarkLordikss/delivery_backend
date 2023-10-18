@@ -78,11 +78,11 @@ public class DishService
         });
     }
 
-    public bool RateDish(Guid dishId, Guid userId, int ratingValue)
+    public int? RateDish(Guid dishId, Guid userId, int ratingValue)
     {
         if (!UserHasPermissionToRateDish(dishId, userId))
         {
-            return false;
+            return null;
         }
 
         var existingRating = _context.Ratings
@@ -91,6 +91,10 @@ public class DishService
         if (existingRating != null)
         {
             existingRating.Value = ratingValue;
+
+            _context.SaveChanges();
+
+            return existingRating.Id;
         }
         else
         {
@@ -102,14 +106,12 @@ public class DishService
             };
 
             _context.Ratings.Add(newRating);
+            _context.SaveChanges();
+
+            return newRating.Id;
         }
-
-        _context.SaveChanges();
-
-        UpdateDishRating(dishId);
-
-        return true;
     }
+
 
 
     private void UpdateDishRating(Guid dishId)

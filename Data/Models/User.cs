@@ -1,5 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 
 namespace food_delivery.Data.Models
 {
@@ -18,7 +20,6 @@ namespace food_delivery.Data.Models
 
         public string Email { get; set; }
 
-        public string PasswordHash { get; set; }
-        public string Address { get; set; }
+        public Guid Addressid { get; set; }
     }
 }

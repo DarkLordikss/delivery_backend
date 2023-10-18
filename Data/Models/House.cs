@@ -7,22 +7,22 @@ namespace food_delivery.Data.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
-        public int Objectid { get; set; }
+        public long Objectid { get; set; }
 
         public Guid Objectguid { get; set; }
 
         public string Housenum { get; set; }
 
-        public string Addnum1 { get; set; }
+        public string? Addnum1 { get; set; }
 
-        public string Addnum2 { get; set; }
+        public string? Addnum2 { get; set; }
 
-        public string Addtype1 { get; set; }
+        public int? Addtype1 { get; set; }
 
-        public string Addtype2 { get; set; }
+        public int? Addtype2 { get; set; }
 
-        public bool Isactive { get; set; }
+        public int Isactive { get; set; }
     }
 }
