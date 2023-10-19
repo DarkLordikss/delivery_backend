@@ -39,5 +39,28 @@ namespace food_delivery.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
             }
         }
+
+        [HttpGet("getaddresschain")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<AddressElement>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
+        [SwaggerOperation(Summary = "Give full address chain for element")]
+        [Produces("application/json")]
+        public ActionResult GetAddressChain(Guid objectGuid)
+        {
+            try
+            {
+                var addressChain = _addressService.GetFullAddressChain(objectGuid);
+
+                return Ok(addressChain);
+            }
+            catch (Exception ex)
+            {
+                var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
+
+                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
+            }
+        }
+
     }
 }
