@@ -3,6 +3,7 @@ using food_delivery.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Collections.Generic;
+using food_delivery.ResponseModels;
 
 public class DishService
 {
@@ -13,12 +14,12 @@ public class DishService
         _context = context;
     }
 
-    public IQueryable<Dish> GetDishes(
-        int page = 1,
-        int pageSize = 20,
-        string[] categories = null,
-        bool vegetarian = false,
-        string sorting = "NameAsc"
+    public MenuResponse GetDishes(
+        int page,
+        int pageSize,
+        string[] categories,
+        bool vegetarian,
+        string sorting
     )
     {
         var query = _context.Dishes.AsQueryable();
@@ -31,6 +32,14 @@ public class DishService
         if (vegetarian)
         {
             query = query.Where(d => d.IsVegetarian);
+        }
+
+        var totalCount = query.Count();
+        var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+        if (page > totalPages)
+        {
+            throw new FileNotFoundException();
         }
 
         switch (sorting)
@@ -57,8 +66,24 @@ public class DishService
                 break;
         }
 
-        return query.Skip((page - 1) * pageSize).Take(pageSize);
+        var dishes = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+        var pagination = new Pagination
+        {
+            Size = pageSize,
+            Count = totalPages,
+            Current = page
+        };
+
+        var menuResponse = new MenuResponse
+        {
+            Dishes = dishes,
+            Pagination = pagination
+        };
+
+        return menuResponse;
     }
+
 
     public Dish GetDish(Guid id)
     {
