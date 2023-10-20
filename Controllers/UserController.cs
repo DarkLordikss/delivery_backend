@@ -47,6 +47,12 @@ namespace food_delivery.Controllers
 
                 return Conflict(errorResponce);
             }
+            catch (FileNotFoundException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "This user`s address not exist." };
+
+                return Conflict(errorResponce);
+            }
             catch (Exception ex)
             {
                 var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
