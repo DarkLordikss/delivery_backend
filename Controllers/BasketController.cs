@@ -91,5 +91,44 @@ namespace food_delivery.Controllers
             }
         }
 
+        [HttpDelete("dish/{dishId}")]
+        [Authorize(Policy = "TokenSeriesPolicy")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IdDishInCartResponse))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
+        [SwaggerOperation(Summary = "Decrease the number of dishes in the cart(if increase = true), or remove the dish completely(increase = false)")]
+        [Produces("application/json")]
+        public IActionResult DecreaseOrRemoveDish(Guid dishId, bool increase)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+                Guid.TryParse(userIdClaim.Value, out Guid parsedUserId);
+
+                int dishInCartId = _basketService.DecreaseOrRemoveDishFromBasket(parsedUserId, dishId, increase);
+
+                return Ok(new IdDishInCartResponse { DishInCartId = dishInCartId });
+            }
+            catch (ArgumentException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "User not found." };
+                return NotFound(errorResponce);
+            }
+            catch (FileNotFoundException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "Dish not in cart." };
+                return NotFound(errorResponce);
+            }
+            catch (Exception ex)
+            {
+                var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
+                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
+            }
+        }
+
     }
 }
