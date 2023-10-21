@@ -24,7 +24,7 @@ namespace food_delivery.Services
 
             var existingUser = _context.Users.SingleOrDefault(u => u.Email == user.Email || u.Phone == user.Phone);
 
-            var existingAddress = _context.Houses.SingleOrDefault(a => a.Objectguid == user.Addressid);
+            var existingAddress = _context.Houses.SingleOrDefault(a => a.Objectguid == user.Addressid && a.Isactive == 1);
 
             if (existingUser != null)
             {
