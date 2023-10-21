@@ -53,12 +53,13 @@ namespace food_delivery.Services
             return userBasket;
         }
 
-        public int? AddDishToBasket(Guid userId, Guid dishId, int count)
+        public int AddDishToBasket(Guid userId, Guid dishId, int count)
         {
             var dish = _context.Dishes.SingleOrDefault(d => d.Id == dishId);
+
             if (dish == null)
             {
-                return null;
+                throw new FileNotFoundException();
             }
 
             var existingCartItem = _context.DishesInCart
@@ -85,17 +86,17 @@ namespace food_delivery.Services
             existingCartItem = _context.DishesInCart
                 .SingleOrDefault(item => item.UserId == userId && item.DishId == dishId && item.OrderId == null);
 
-            return existingCartItem?.Id;
+            return existingCartItem.Id;
         }
 
-        public int? DecreaseOrRemoveDishFromBasket(Guid userId, Guid dishId, bool increase)
+        public int DecreaseOrRemoveDishFromBasket(Guid userId, Guid dishId, bool increase)
         {
             var cartItem = _context.DishesInCart
                 .SingleOrDefault(item => item.UserId == userId && item.DishId == dishId && item.OrderId == null);
 
             if (cartItem == null)
             {
-                return null;
+                throw new FileNotFoundException();
             }
 
             if (increase)
