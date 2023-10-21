@@ -1,9 +1,11 @@
 ﻿using food_delivery.Data.Models;
 using food_delivery.ErrorModels;
 using food_delivery.ResponseModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace food_delivery.Controllers
 {
@@ -87,6 +89,48 @@ namespace food_delivery.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
             }
         }
+
+        [HttpGet("{id}/rating/check")]
+        [Authorize(Policy = "TokenSeriesPolicy")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
+        [SwaggerOperation(Summary = "Check if the user has permission to rate a dish")]
+        [Produces("application/json")]
+        public ActionResult CheckUserPermissionToRateDish(Guid id)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+                Guid.TryParse(userIdClaim.Value, out Guid parsedUserId);
+
+                bool hasPermission = _dishService.UserHasPermissionToRateDish(id, parsedUserId);
+
+                return Ok(new HasPermissionUserResponse { HasPermissionUserResponseToRateDish = hasPermission});
+            }
+            catch (FileNotFoundException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "Dish not found." };
+
+                return NotFound(errorResponce);
+            }
+            catch (ArgumentException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "User not found." };
+
+                return NotFound(errorResponce);
+            }
+            catch (Exception ex)
+            {
+                var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
+                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
+            }
+        }
+
 
     }
 }
