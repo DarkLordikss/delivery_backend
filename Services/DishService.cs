@@ -99,6 +99,8 @@ public class DishService
 
     public bool UserHasPermissionToRateDish(Guid dishId, Guid userId)
     {
+        GetDish(dishId);
+
         var cartItems = _context.DishesInCart
             .Where(item => item.DishId == dishId && item.UserId == userId)
             .ToList();
