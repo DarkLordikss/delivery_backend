@@ -87,7 +87,14 @@ public class DishService
 
     public Dish GetDish(Guid id)
     {
-        return _context.Dishes.SingleOrDefault(d => d.Id == id);
+        var dish = _context.Dishes.SingleOrDefault(d => d.Id == id);
+
+        if (dish == null)
+        {
+            throw new FileNotFoundException();
+        }
+
+        return dish;
     }
 
     public bool UserHasPermissionToRateDish(Guid dishId, Guid userId)
