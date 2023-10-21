@@ -28,6 +28,7 @@ namespace food_delivery.Controllers
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TokenResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
         [SwaggerOperation(Summary = "Register new user")]
         [Produces("application/json")]
@@ -63,7 +64,7 @@ namespace food_delivery.Controllers
 
         [HttpPost("login")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TokenResponse))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
         [SwaggerOperation(Summary = "Login into the system")]
         [Produces("application/json")]
@@ -81,7 +82,7 @@ namespace food_delivery.Controllers
             {
                 var errorResponce = new ErrorResponse { ErrorMessage = "Invalid email or password." };
 
-                return Conflict(errorResponce);
+                return BadRequest(errorResponce);
             }
             catch (Exception ex)
             {

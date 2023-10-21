@@ -92,7 +92,7 @@ namespace food_delivery.Controllers
 
         [HttpGet("{id}/rating/check")]
         [Authorize(Policy = "TokenSeriesPolicy")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(HasPermissionUserResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -115,13 +115,11 @@ namespace food_delivery.Controllers
             catch (FileNotFoundException ex)
             {
                 var errorResponce = new ErrorResponse { ErrorMessage = "Dish not found." };
-
                 return NotFound(errorResponce);
             }
             catch (ArgumentException ex)
             {
                 var errorResponce = new ErrorResponse { ErrorMessage = "User not found." };
-
                 return NotFound(errorResponce);
             }
             catch (Exception ex)
@@ -131,6 +129,55 @@ namespace food_delivery.Controllers
             }
         }
 
+        [HttpPost("{id}/rating")]
+        [Authorize(Policy = "TokenSeriesPolicy")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IdRatingResponse))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
+        [SwaggerOperation(Summary = "Rate a dish")]
+        [Produces("application/json")]
+        public ActionResult SetRateDish(Guid id, int ratingScore)
+        {
+            try
+            {
+                if (ratingScore < 1 || ratingScore > 5)
+                {
+                    var errorResponce = new ErrorResponse { ErrorMessage = "ratingScore must be between 1 and 5." };
+                    return StatusCode(StatusCodes.Status400BadRequest, errorResponce);
+                }
+
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+                Guid.TryParse(userIdClaim.Value, out Guid parsedUserId);
+
+                int ratingId = _dishService.RateDish(id, parsedUserId, ratingScore);
+
+                return Ok(new IdRatingResponse { RatingId = ratingId });
+            }
+            catch (FileNotFoundException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "Dish not found." };
+                return NotFound(errorResponce);
+            }
+            catch (ArgumentException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "User not found." };
+                return NotFound(errorResponce);
+            }
+            catch (MethodAccessException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "User has no permission to rate this dish." };
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponce);
+            }
+            catch (Exception ex)
+            {
+                var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
+                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
+            }
+        }
 
     }
 }
