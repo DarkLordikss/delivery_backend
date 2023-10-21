@@ -116,7 +116,7 @@ public class DishService
     {
         if (!UserHasPermissionToRateDish(dishId, userId))
         {
-            return null;
+            throw new MethodAccessException();
         }
 
         var existingRating = _context.Ratings
