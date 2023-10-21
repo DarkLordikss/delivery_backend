@@ -2,6 +2,6 @@
 {
     public class IdRatingResponse
     {
-        public int Id { get; set; }
+        public int RatingId { get; set; }
     }
 }
