@@ -14,12 +14,10 @@ namespace food_delivery.Controllers
     public class DishController : ControllerBase
     {
         private readonly DishService _dishService;
-        private readonly TokenService _tokenService;
 
-        public DishController(DishService dishService, TokenService tokenService)
+        public DishController(DishService dishService)
         {
             _dishService = dishService;
-            _tokenService = tokenService;
         }
 
         [HttpGet]
