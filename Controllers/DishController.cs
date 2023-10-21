@@ -60,6 +60,33 @@ namespace food_delivery.Controllers
 
                 return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
             }
-        }   
+        }
+
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Dish))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
+        [SwaggerOperation(Summary = "Get dish by ID")]
+        [Produces("application/json")]
+        public ActionResult GetDishById(Guid id)
+        {
+            try
+            {
+                var dish = _dishService.GetDish(id);
+                return Ok(dish);
+            }
+            catch (FileNotFoundException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "Dish not found." };
+                return NotFound(errorResponce);
+            }
+            catch (Exception ex)
+            {
+                var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
+                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
+            }
+        }
+
     }
 }
