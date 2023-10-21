@@ -128,6 +128,8 @@ public class DishService
 
             _context.SaveChanges();
 
+            UpdateDishRating(dishId);
+
             return existingRating.Id;
         }
         else
@@ -141,6 +143,9 @@ public class DishService
 
             _context.Ratings.Add(newRating);
             _context.SaveChanges();
+
+            UpdateDishRating(dishId);
+
 
             return newRating.Id;
         }
