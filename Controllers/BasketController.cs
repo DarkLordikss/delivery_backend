@@ -19,5 +19,38 @@ namespace food_delivery.Controllers
             _basketService = basketService;
         }
 
+        [HttpGet]
+        [Authorize(Policy = "TokenSeriesPolicy")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BasketResponse))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
+        [SwaggerOperation(Summary = "Get user cart")]
+        [Produces("application/json")]
+        public IActionResult GetBasket()
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+                Guid.TryParse(userIdClaim.Value, out Guid parsedUserId);
+
+                var cart = _basketService.GetUserBasket(parsedUserId);
+
+                return Ok(cart);
+            }
+            catch (ArgumentException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "User not found." };
+                return NotFound(errorResponce);
+            }
+            catch (Exception ex)
+            {
+                var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
+                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
+            }
+        }
+
     }
 }
