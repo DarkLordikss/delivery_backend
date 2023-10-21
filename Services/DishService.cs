@@ -112,7 +112,7 @@ public class DishService
         });
     }
 
-    public int? RateDish(Guid dishId, Guid userId, int ratingValue)
+    public int RateDish(Guid dishId, Guid userId, int ratingValue)
     {
         if (!UserHasPermissionToRateDish(dishId, userId))
         {
