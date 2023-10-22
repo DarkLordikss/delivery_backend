@@ -1,5 +1,6 @@
 ﻿using food_delivery.Data.Models;
 using food_delivery.ErrorModels;
+using food_delivery.RequestModels;
 using food_delivery.ResponseModels;
 using food_delivery.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -92,6 +93,49 @@ namespace food_delivery.Controllers
             catch (FileNotFoundException ex)
             {
                 var errorResponce = new ErrorResponse { ErrorMessage = "Orders not found." };
+                return NotFound(errorResponce);
+            }
+            catch (Exception ex)
+            {
+                var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
+                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "TokenSeriesPolicy")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GuidOrderResponse))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
+        [SwaggerOperation(Summary = "Create order from cart")]
+        [Produces("application/json")]
+        public IActionResult CreateOrderFromCart(OrderCreateRequest orderData)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                Guid.TryParse(userIdClaim.Value, out Guid parsedUserId);
+
+                var orderId = _orderService.CreateOrder(parsedUserId, orderData);
+
+                return Ok(new GuidOrderResponse { OrderId = orderId });
+            }
+            catch (ArgumentException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "User not found." };
+                return NotFound(errorResponce);
+            }
+            catch (FileNotFoundException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "Dishes in cart not found." };
+                return NotFound(errorResponce);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "Address not exist." };
                 return NotFound(errorResponce);
             }
             catch (Exception ex)
