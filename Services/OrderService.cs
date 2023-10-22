@@ -3,6 +3,7 @@ using food_delivery.Data.Models;
 using food_delivery.RequestModels;
 using food_delivery.ResponseModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace food_delivery.Services
 {
@@ -14,13 +15,20 @@ namespace food_delivery.Services
         {
             _context = context;
         }
-        public OrderWithDishesResponse GetOrderInfo(Guid orderId)
+        public OrderWithDishesResponse GetOrderInfo(Guid orderId, Guid userId)
         {
             var order = _context.Orders.SingleOrDefault(o => o.Id == orderId);
 
             if (order == null)
             {
                 throw new FileNotFoundException();
+            }
+
+            var user = _context.DishesInCart.FirstOrDefault(d => d.UserId == userId && d.OrderId == orderId);
+
+            if (user == null)
+            {
+                throw new MethodAccessException();
             }
 
             var dishes = GetOrderItems(order.Id);
@@ -97,13 +105,20 @@ namespace food_delivery.Services
             return newOrderId;
         }
 
-        public Guid ConfirmOrder(Guid orderId)
+        public Guid ConfirmOrder(Guid orderId, Guid userId)
         {
             var order = _context.Orders.SingleOrDefault(o => o.Id == orderId);
 
             if (order == null)
             {
                 throw new FileNotFoundException();
+            }
+
+            var user = _context.DishesInCart.FirstOrDefault(d => d.UserId == userId && d.OrderId == orderId);
+
+            if (user == null)
+            {
+                throw new MethodAccessException();
             }
 
             order.Status = "Delivered";
