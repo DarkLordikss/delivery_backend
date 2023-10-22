@@ -80,6 +80,13 @@ namespace food_delivery.Services
                 throw new FileNotFoundException();
             }
 
+            var existingAddress = _context.Houses.SingleOrDefault(a => a.Objectguid == createOrderModel.AddressId && a.Isactive == 1);
+
+            if (existingAddress != null)
+            {
+                throw new KeyNotFoundException();
+            }
+
             foreach (var cartItem in cartItems)
             {
                 cartItem.OrderId = newOrderId;
