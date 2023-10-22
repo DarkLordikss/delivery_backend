@@ -75,14 +75,14 @@ namespace food_delivery.Services
                 .Where(d => d.UserId == userId && d.OrderId == null)
                 .ToList();
 
-            if (cartItems == null)
+            if (!cartItems.Any())
             {
                 throw new FileNotFoundException();
             }
 
             var existingAddress = _context.Houses.SingleOrDefault(a => a.Objectguid == createOrderModel.AddressId && a.Isactive == 1);
 
-            if (existingAddress != null)
+            if (existingAddress == null)
             {
                 throw new KeyNotFoundException();
             }
