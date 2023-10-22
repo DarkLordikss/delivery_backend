@@ -24,9 +24,16 @@ namespace food_delivery.Services
 
             var existingUser = _context.Users.SingleOrDefault(u => u.Email == user.Email || u.Phone == user.Phone);
 
+            var existingAddress = _context.Houses.SingleOrDefault(a => a.Objectguid == user.Addressid && a.Isactive == 1);
+
             if (existingUser != null)
             {
                 throw new ArgumentException();
+            }
+
+            if (existingAddress == null)
+            {
+                throw new FileNotFoundException();
             }
 
             var newUser = new User
