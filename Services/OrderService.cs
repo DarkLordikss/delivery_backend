@@ -59,7 +59,7 @@ namespace food_delivery.Services
                 .Where(o => uniqueOrderIds.Contains(o.Id))
                 .AsQueryable();
 
-            if (orders == null)
+            if (!orders.Any())
             {
                 throw new FileNotFoundException();
             }

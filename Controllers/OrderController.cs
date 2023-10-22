@@ -1,4 +1,5 @@
-﻿using food_delivery.ErrorModels;
+﻿using food_delivery.Data.Models;
+using food_delivery.ErrorModels;
 using food_delivery.ResponseModels;
 using food_delivery.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -24,7 +25,7 @@ namespace food_delivery.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OrderWithDishesResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
         [SwaggerOperation(Summary = "Get info about order")]
@@ -61,5 +62,44 @@ namespace food_delivery.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
             }
         }
+
+        [HttpGet]
+        [Authorize(Policy = "TokenSeriesPolicy")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IQueryable<Order>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
+        [SwaggerOperation(Summary = "Get a list of orders")]
+        [Produces("application/json")]
+        public IActionResult GetOrdersList()
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                Guid.TryParse(userIdClaim.Value, out Guid parsedUserId);
+
+                var orders = _orderService.GetOrders(parsedUserId);
+
+                return Ok(orders);
+            }
+            catch (ArgumentException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "User not found." };
+                return NotFound(errorResponce);
+            }
+            catch (FileNotFoundException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "Orders not found." };
+                return NotFound(errorResponce);
+            }
+            catch (Exception ex)
+            {
+                var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
+                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
+            }
+        }
+
     }
 }
