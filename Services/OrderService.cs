@@ -128,6 +128,11 @@ namespace food_delivery.Services
                 throw new MethodAccessException();
             }
 
+            if (order.Status == "Delivered")
+            {
+                throw new DuplicateWaitObjectException();
+            }
+
             order.Status = "Delivered";
             _context.SaveChanges();
 
