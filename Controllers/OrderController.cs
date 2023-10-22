@@ -1,173 +1,60 @@
 ﻿using food_delivery.Data.Models;
 using food_delivery.ErrorModels;
+using food_delivery.RequestModels;
 using food_delivery.ResponseModels;
+using food_delivery.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
 namespace food_delivery.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DishController : ControllerBase
+    public class OrderController : ControllerBase
     {
-        private readonly DishService _dishService;
+        private readonly OrderService _orderService;
 
-        public DishController(DishService dishService)
+        public OrderController(OrderService orderService)
         {
-            _dishService = dishService;
+            _orderService = orderService;
         }
 
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(MenuResponse))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
-        [SwaggerOperation(Summary = "Get menu")]
-        [Produces("application/json")]
-        public ActionResult GetDishesList(
-            [FromQuery]
-            string[] categories = null,
-            bool isVegeterian = false,
-            [EnumDataType(typeof(Sorting), ErrorMessage = "Invalid sorting value.")]
-            string sorting = "NameAsc",
-            int page = 1,
-            int pageSize = 20
-            )
-        {
-            try
-            {
-                if (page < 1)
-                {
-                    page = 1;
-                }
-
-                var pageData = _dishService.GetDishes(page, pageSize, categories, isVegeterian, sorting);
-
-                return Ok(pageData);
-            }
-            catch (FileNotFoundException ex)
-            {
-                var errorResponce = new ErrorResponse { ErrorMessage = "Page not found." };
-
-                return NotFound(errorResponce);
-            }
-            catch (Exception ex)
-            {
-                var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
-
-                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
-            }
-        }
-
-        [HttpGet("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Dish))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
-        [SwaggerOperation(Summary = "Get dish by ID")]
-        [Produces("application/json")]
-        public ActionResult GetDishById(Guid id)
-        {
-            try
-            {
-                var dish = _dishService.GetDish(id);
-                return Ok(dish);
-            }
-            catch (FileNotFoundException ex)
-            {
-                var errorResponce = new ErrorResponse { ErrorMessage = "Dish not found." };
-                return NotFound(errorResponce);
-            }
-            catch (Exception ex)
-            {
-                var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
-                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
-            }
-        }
-
-        [HttpGet("{id}/rating/check")]
+        [HttpGet("{orderId}")]
         [Authorize(Policy = "TokenSeriesPolicy")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(HasPermissionUserResponse))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OrderWithDishesResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
-        [SwaggerOperation(Summary = "Check if the user has permission to rate a dish")]
-        [Produces("application/json")]
-        public ActionResult CheckUserPermissionToRateDish(Guid id)
-        {
-            try
-            {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-                Guid.TryParse(userIdClaim.Value, out Guid parsedUserId);
-
-                bool hasPermission = _dishService.UserHasPermissionToRateDish(id, parsedUserId);
-
-                return Ok(new HasPermissionUserResponse { HasPermissionUserResponseToRateDish = hasPermission});
-            }
-            catch (FileNotFoundException ex)
-            {
-                var errorResponce = new ErrorResponse { ErrorMessage = "Dish not found." };
-                return NotFound(errorResponce);
-            }
-            catch (ArgumentException ex)
-            {
-                var errorResponce = new ErrorResponse { ErrorMessage = "User not found." };
-                return NotFound(errorResponce);
-            }
-            catch (Exception ex)
-            {
-                var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
-                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
-            }
-        }
-
-        [HttpPost("{id}/rating")]
-        [Authorize(Policy = "TokenSeriesPolicy")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IdRatingResponse))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResponse))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
-        [SwaggerOperation(Summary = "Rate a dish")]
+        [SwaggerOperation(Summary = "Get info about order")]
         [Produces("application/json")]
-        public ActionResult SetRateDish(Guid id, int ratingScore)
+        public IActionResult GetOrder(Guid orderId)
         {
             try
             {
-                if (ratingScore < 1 || ratingScore > 5)
-                {
-                    var errorResponce = new ErrorResponse { ErrorMessage = "ratingScore must be between 1 and 5." };
-                    return StatusCode(StatusCodes.Status400BadRequest, errorResponce);
-                }
-
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
                 Guid.TryParse(userIdClaim.Value, out Guid parsedUserId);
 
-                int ratingId = _dishService.RateDish(id, parsedUserId, ratingScore);
+                var order = _orderService.GetOrderInfo(orderId, parsedUserId);
 
-                return Ok(new IdRatingResponse { RatingId = ratingId });
-            }
-            catch (FileNotFoundException ex)
-            {
-                var errorResponce = new ErrorResponse { ErrorMessage = "Dish not found." };
-                return NotFound(errorResponce);
+                return Ok(order);
             }
             catch (ArgumentException ex)
             {
                 var errorResponce = new ErrorResponse { ErrorMessage = "User not found." };
                 return NotFound(errorResponce);
             }
+            catch (FileNotFoundException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "Order not found." };
+                return NotFound(errorResponce);
+            }
             catch (MethodAccessException ex)
             {
-                var errorResponce = new ErrorResponse { ErrorMessage = "User has no permission to rate this dish." };
+                var errorResponce = new ErrorResponse { ErrorMessage = "User has no access for this order." };
                 return StatusCode(StatusCodes.Status403Forbidden, errorResponce);
             }
             catch (Exception ex)
@@ -177,5 +64,133 @@ namespace food_delivery.Controllers
             }
         }
 
+        [HttpGet]
+        [Authorize(Policy = "TokenSeriesPolicy")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IQueryable<Order>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
+        [SwaggerOperation(Summary = "Get a list of orders")]
+        [Produces("application/json")]
+        public IActionResult GetOrdersList()
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                Guid.TryParse(userIdClaim.Value, out Guid parsedUserId);
+
+                var orders = _orderService.GetOrders(parsedUserId);
+
+                return Ok(orders);
+            }
+            catch (ArgumentException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "User not found." };
+                return NotFound(errorResponce);
+            }
+            catch (FileNotFoundException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "Orders not found." };
+                return NotFound(errorResponce);
+            }
+            catch (Exception ex)
+            {
+                var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
+                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "TokenSeriesPolicy")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GuidOrderResponse))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
+        [SwaggerOperation(Summary = "Create order from cart")]
+        [Produces("application/json")]
+        public IActionResult CreateOrderFromCart(OrderCreateRequest orderData)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                Guid.TryParse(userIdClaim.Value, out Guid parsedUserId);
+
+                var orderId = _orderService.CreateOrder(parsedUserId, orderData);
+
+                return Ok(new GuidOrderResponse { OrderId = orderId });
+            }
+            catch (ArgumentException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "User not found." };
+                return NotFound(errorResponce);
+            }
+            catch (FileNotFoundException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "Dishes in cart not found." };
+                return NotFound(errorResponce);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "Address not exist." };
+                return NotFound(errorResponce);
+            }
+            catch (Exception ex)
+            {
+                var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
+                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
+            }
+        }
+
+        [HttpPost("{id}/status")]
+        [Authorize(Policy = "TokenSeriesPolicy")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GuidOrderResponse))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
+        [SwaggerOperation(Summary = "Confirm order delivery")]
+        [Produces("application/json")]
+        public IActionResult ConfirmOrder(Guid id)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                Guid.TryParse(userIdClaim.Value, out Guid parsedUserId);
+
+                var orderId = _orderService.ConfirmOrder(id, parsedUserId);
+
+                return Ok(new GuidOrderResponse { OrderId = orderId });
+            }
+            catch (DuplicateWaitObjectException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "Order already has status 'Delivered'." };
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponce);
+            }
+            catch (ArgumentException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "User not found." };
+                return NotFound(errorResponce);
+            }
+            catch (FileNotFoundException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "Order not found." };
+                return NotFound(errorResponce);
+            }
+            catch (MethodAccessException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "User has no access for this order." };
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponce);
+            }
+            catch (Exception ex)
+            {
+                var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
+                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
+            }
+        }
     }
 }

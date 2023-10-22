@@ -3,6 +3,7 @@ using food_delivery.Data.Models;
 using food_delivery.RequestModels;
 using food_delivery.ResponseModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace food_delivery.Services
 {
@@ -14,13 +15,20 @@ namespace food_delivery.Services
         {
             _context = context;
         }
-        public OrderWithDishesResponse? GetOrderInfo(Guid orderId)
+        public OrderWithDishesResponse GetOrderInfo(Guid orderId, Guid userId)
         {
             var order = _context.Orders.SingleOrDefault(o => o.Id == orderId);
 
             if (order == null)
             {
-                return null;
+                throw new FileNotFoundException();
+            }
+
+            var user = _context.DishesInCart.FirstOrDefault(d => d.UserId == userId && d.OrderId == orderId);
+
+            if (user == null)
+            {
+                throw new MethodAccessException();
             }
 
             var dishes = GetOrderItems(order.Id);
@@ -51,10 +59,15 @@ namespace food_delivery.Services
                 .Where(o => uniqueOrderIds.Contains(o.Id))
                 .AsQueryable();
 
+            if (!orders.Any())
+            {
+                throw new FileNotFoundException();
+            }
+
             return orders;
         }
 
-        public Guid? CreateOrder(Guid userId, OrderCreateRequest createOrderModel)
+        public Guid CreateOrder(Guid userId, OrderCreateRequest createOrderModel)
         {
             var newOrderId = Guid.NewGuid();
 
@@ -62,9 +75,16 @@ namespace food_delivery.Services
                 .Where(d => d.UserId == userId && d.OrderId == null)
                 .ToList();
 
-            if (cartItems == null)
+            if (!cartItems.Any())
             {
-                return null;
+                throw new FileNotFoundException();
+            }
+
+            var existingAddress = _context.Houses.SingleOrDefault(a => a.Objectguid == createOrderModel.AddressId && a.Isactive == 1);
+
+            if (existingAddress == null)
+            {
+                throw new KeyNotFoundException();
             }
 
             foreach (var cartItem in cartItems)
@@ -92,13 +112,25 @@ namespace food_delivery.Services
             return newOrderId;
         }
 
-        public Guid? ConfirmOrder(Guid orderId)
+        public Guid ConfirmOrder(Guid orderId, Guid userId)
         {
             var order = _context.Orders.SingleOrDefault(o => o.Id == orderId);
 
             if (order == null)
             {
-                return null;
+                throw new FileNotFoundException();
+            }
+
+            var user = _context.DishesInCart.FirstOrDefault(d => d.UserId == userId && d.OrderId == orderId);
+
+            if (user == null)
+            {
+                throw new MethodAccessException();
+            }
+
+            if (order.Status == "Delivered")
+            {
+                throw new DuplicateWaitObjectException();
             }
 
             order.Status = "Delivered";
