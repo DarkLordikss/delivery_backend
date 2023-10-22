@@ -145,5 +145,52 @@ namespace food_delivery.Controllers
             }
         }
 
+        [HttpPost("{id}/status")]
+        [Authorize(Policy = "TokenSeriesPolicy")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GuidOrderResponse))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
+        [SwaggerOperation(Summary = "Confirm order delivery")]
+        [Produces("application/json")]
+        public IActionResult ConfirmOrder(Guid id)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                Guid.TryParse(userIdClaim.Value, out Guid parsedUserId);
+
+                var orderId = _orderService.ConfirmOrder(id, parsedUserId);
+
+                return Ok(new GuidOrderResponse { OrderId = orderId });
+            }
+            catch (DuplicateWaitObjectException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "Order already has status 'Delivered'." };
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponce);
+            }
+            catch (ArgumentException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "User not found." };
+                return NotFound(errorResponce);
+            }
+            catch (FileNotFoundException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "Order not found." };
+                return NotFound(errorResponce);
+            }
+            catch (MethodAccessException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "User has no access for this order." };
+                return StatusCode(StatusCodes.Status403Forbidden, errorResponce);
+            }
+            catch (Exception ex)
+            {
+                var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
+                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
+            }
+        }
     }
 }
