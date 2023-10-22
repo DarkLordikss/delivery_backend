@@ -14,13 +14,13 @@ namespace food_delivery.Services
         {
             _context = context;
         }
-        public OrderWithDishesResponse? GetOrderInfo(Guid orderId)
+        public OrderWithDishesResponse GetOrderInfo(Guid orderId)
         {
             var order = _context.Orders.SingleOrDefault(o => o.Id == orderId);
 
             if (order == null)
             {
-                return null;
+                throw new FileNotFoundException();
             }
 
             var dishes = GetOrderItems(order.Id);
@@ -51,10 +51,15 @@ namespace food_delivery.Services
                 .Where(o => uniqueOrderIds.Contains(o.Id))
                 .AsQueryable();
 
+            if (orders == null)
+            {
+                throw new FileNotFoundException();
+            }
+
             return orders;
         }
 
-        public Guid? CreateOrder(Guid userId, OrderCreateRequest createOrderModel)
+        public Guid CreateOrder(Guid userId, OrderCreateRequest createOrderModel)
         {
             var newOrderId = Guid.NewGuid();
 
@@ -64,7 +69,7 @@ namespace food_delivery.Services
 
             if (cartItems == null)
             {
-                return null;
+                throw new FileNotFoundException();
             }
 
             foreach (var cartItem in cartItems)
@@ -92,13 +97,13 @@ namespace food_delivery.Services
             return newOrderId;
         }
 
-        public Guid? ConfirmOrder(Guid orderId)
+        public Guid ConfirmOrder(Guid orderId)
         {
             var order = _context.Orders.SingleOrDefault(o => o.Id == orderId);
 
             if (order == null)
             {
-                return null;
+                throw new FileNotFoundException();
             }
 
             order.Status = "Delivered";
