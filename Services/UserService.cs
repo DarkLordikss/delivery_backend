@@ -126,6 +126,13 @@ namespace food_delivery.Services
                 throw new ArgumentException();
             }
 
+            var existingAddress = _context.Houses.SingleOrDefault(a => a.Objectguid == newUserData.Addressid && a.Isactive == 1);
+
+            if (existingAddress == null)
+            {
+                throw new FileNotFoundException();
+            }
+
             oldUser.FullName = newUserData.FullName;
             oldUser.Addressid = newUserData.Addressid;
             oldUser.BirthDate = newUserData.BirthDate;
