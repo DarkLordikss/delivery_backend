@@ -170,6 +170,7 @@ namespace food_delivery.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ErrorResponse))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
         [SwaggerOperation(Summary = "Edit user profile")]
         [Produces("application/json")]
@@ -185,6 +186,12 @@ namespace food_delivery.Controllers
 
                 return Ok(new GuidUserResponse { UserId = userId });
 
+            }
+            catch (DuplicateWaitObjectException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "This user`s number is already exist." };
+
+                return Conflict(errorResponce);
             }
             catch (ArgumentException ex)
             {
