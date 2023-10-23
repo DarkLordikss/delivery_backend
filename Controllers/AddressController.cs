@@ -43,6 +43,7 @@ namespace food_delivery.Controllers
         [HttpGet("getaddresschain")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<AddressElement>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorResponse))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorResponse))]
         [SwaggerOperation(Summary = "Give full address chain for element")]
         [Produces("application/json")]
@@ -53,6 +54,12 @@ namespace food_delivery.Controllers
                 var addressChain = _addressService.GetFullAddressChain(objectGuid);
 
                 return Ok(addressChain);
+            }
+            catch (FileNotFoundException ex)
+            {
+                var errorResponse = new ErrorResponse { ErrorMessage = "Address not exist." };
+
+                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
             }
             catch (Exception ex)
             {
