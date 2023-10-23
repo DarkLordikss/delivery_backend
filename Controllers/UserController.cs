@@ -203,7 +203,7 @@ namespace food_delivery.Controllers
             {
                 var errorResponce = new ErrorResponse { ErrorMessage = "This user`s address not exist." };
 
-                return NotFound(errorResponce);
+                return BadRequest(errorResponce);
             }
             catch (Exception ex)
             {
