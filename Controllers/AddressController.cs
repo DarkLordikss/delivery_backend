@@ -59,7 +59,7 @@ namespace food_delivery.Controllers
             {
                 var errorResponse = new ErrorResponse { ErrorMessage = "Address not exist." };
 
-                return StatusCode(StatusCodes.Status500InternalServerError, errorResponse);
+                return StatusCode(StatusCodes.Status404NotFound, errorResponse);
             }
             catch (Exception ex)
             {
