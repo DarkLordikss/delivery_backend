@@ -127,6 +127,12 @@ namespace food_delivery.Services
             }
 
             var existingAddress = _context.Houses.SingleOrDefault(a => a.Objectguid == newUserData.Addressid && a.Isactive == 1);
+            var existingUser = _context.Users.SingleOrDefault(u => u.Phone == newUserData.Phone);
+
+            if (existingUser != null)
+            {
+                throw new DuplicateWaitObjectException();
+            }
 
             if (existingAddress == null)
             {
