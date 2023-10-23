@@ -189,7 +189,7 @@ namespace food_delivery.Controllers
             }
             catch (DuplicateWaitObjectException ex)
             {
-                var errorResponce = new ErrorResponse { ErrorMessage = "This user`s address not exist." };
+                var errorResponce = new ErrorResponse { ErrorMessage = "This user`s number is already exist." };
 
                 return Conflict(errorResponce);
             }
