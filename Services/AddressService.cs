@@ -41,7 +41,7 @@ public class AddressService
 
             if (initialHouse == null)
             {
-                return result;
+                throw new FileNotFoundException();
             }
             else
             {
