@@ -52,8 +52,8 @@ public class AddressService
                 initialElement.Id = initialHouse.Id;
                 initialElement.Objectid = initialHouse.Objectid;
                 initialElement.Name = initialHouse.Housenum;
-                initialElement.Typename = "Здание (сооружение)";
-                initialElement.Level = "17";
+                initialElement.Typename = "д";
+                initialElement.Level = "10";
             }
         }
 
@@ -89,6 +89,11 @@ public class AddressService
         }
 
         result.Reverse();
+
+        if (!result.Any())
+        {
+            throw new FileNotFoundException();
+        }
 
         return result;
     }
