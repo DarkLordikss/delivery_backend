@@ -192,6 +192,12 @@ namespace food_delivery.Controllers
 
                 return NotFound(errorResponce);
             }
+            catch (FileNotFoundException ex)
+            {
+                var errorResponce = new ErrorResponse { ErrorMessage = "This user`s address not exist." };
+
+                return NotFound(errorResponce);
+            }
             catch (Exception ex)
             {
                 var errorResponse = new ErrorResponse { ErrorMessage = "An internal server error occurred." };
