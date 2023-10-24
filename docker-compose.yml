@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  db:
+    container_name: db
+    image: postgres:latest
+    hostname: db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: supersecretpassword
+      POSTGRES_DB: food_db
+    expose:
+      - "5432"
+    networks:
+      - net
+    restart: unless-stopped
+    volumes:
+      - /var/docker-db-lab:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      - "127.0.0.1:80:5000"
+    depends_on:
+      - db
+    networks:
+      - default
+      - net
+
+networks:
+  net:
