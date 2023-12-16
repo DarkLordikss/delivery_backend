@@ -4,7 +4,7 @@ services:
   db:
     container_name: db
     image: postgres:latest
-    hostname: db
+    hostname: database_host
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: supersecretpassword
@@ -16,7 +16,6 @@ services:
     restart: unless-stopped
     volumes:
       - /var/docker-db-lab:/var/lib/postgresql/data
-
   app:
     build:
       context: .
@@ -28,6 +27,7 @@ services:
       - "127.0.0.1:80:5000"
     depends_on:
       - db
+    restart: on-failure
     networks:
       - default
       - net
